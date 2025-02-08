@@ -1,4 +1,4 @@
-package com.elkhami.core.presentation.designsystem
+package com.elkhami.abnrepoviewer.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
