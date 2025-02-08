@@ -20,10 +20,14 @@ dependencyResolutionManagement {
     }
 }
 
-//gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:testClasses"))
+gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:testClasses"))
 
 rootProject.name = "AbnRepoViewer"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(":app")
+include(":core:domain")
+include(":core:presentation:designsystem")
+include(":core:presentation:ui")
+include(":core:data")

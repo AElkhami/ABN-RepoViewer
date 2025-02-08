@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.abnrepoviewer.android.application.compose)
+    alias(libs.plugins.abnrepoviewer.jvm.ktor)
 }
 
 android {
@@ -21,12 +22,22 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
+    // Timber
+    implementation(libs.timber)
+
+    // Koin
+    implementation(libs.bundles.koin)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(projects.core.presentation.ui)
+    implementation(projects.core.presentation.designsystem)
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
 }
