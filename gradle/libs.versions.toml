@@ -13,6 +13,7 @@ androidTools = "31.8.0"
 ksp = "1.9.22-1.0.17"
 desugar_jdk_libs = "2.0.4"
 composeCompiler = "1.5.9"
+coroutines = "1.8.0"
 
 # Project versions
 projectApplicationId = "com.elkhami.abnrepoviewer"
@@ -36,6 +37,8 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
+
 
 #Compose
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -66,6 +69,9 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 abnrepoviewer-android-application-compose = {id = "abnrepoviewer.android.application.compose", version = "unspecified"}
 abnrepoviewer-android-library = {id = "abnrepoviewer.android.library", version = "unspecified"}
 abnrepoviewer-android-library-compose = {id = "abnrepoviewer.android.library.compose", version = "unspecified"}
+abnrepoviewer-android-feature-ui = {id = "abnrepoviewer.android.feature.ui", version = "unspecified"}
+abnrepoviewer-jvm-library = {id = "abnrepoviewer.jvm.library", version = "unspecified"}
+android-library = { id = "com.android.library", version.ref = "agp" }
 
 [bundles]
 compose = ["androidx-activity-compose", "androidx-lifecycle-runtime-compose", "androidx-lifecycle-viewmodel-compose", "androidx-compose-material3", "androidx-compose-ui", "androidx-compose-ui-graphics", "androidx-compose-ui-tooling-preview"]
