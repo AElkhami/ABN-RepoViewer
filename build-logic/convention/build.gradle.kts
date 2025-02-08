@@ -21,5 +21,22 @@ gradlePlugin {
             id = "abnrepoviewer.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
+        register("androidLibrary"){
+            id = "abnrepoviewer.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+
+        register("androidLibraryCompose"){
+            id = "abnrepoviewer.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
+        register("androidFeatureUi"){
+            id = "abnrepoviewer.android.feature.ui"
+            implementationClass = "AndroidFeatureUiConventionPlugin"
+        }
+        register("jvmLibrary"){
+            id = "abnrepoviewer.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
     }
 }
