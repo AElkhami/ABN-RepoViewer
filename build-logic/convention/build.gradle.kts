@@ -38,5 +38,9 @@ gradlePlugin {
             id = "abnrepoviewer.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
         }
+        register("jvmKtor"){
+            id = "abnrepoviewer.jvm.ktor"
+            implementationClass = "JvmKtorConventionPlugin"
+        }
     }
 }

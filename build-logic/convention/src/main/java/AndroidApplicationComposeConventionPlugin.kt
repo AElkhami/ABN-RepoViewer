@@ -8,7 +8,11 @@ class AndroidApplicationComposeConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
         target.run{
 
-            pluginManager.apply("abnrepoviewer.android.application")
+            pluginManager.run{
+                apply("abnrepoviewer.android.application")
+                apply("org.jetbrains.kotlin.plugin.compose")
+            }
+
 
             extensions.configure<ApplicationExtension>{
                 configureAndroidCompose(this)

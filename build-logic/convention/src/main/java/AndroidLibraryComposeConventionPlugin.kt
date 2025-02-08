@@ -9,6 +9,7 @@ class AndroidLibraryComposeConventionPlugin: Plugin<Project> {
         target.run{
             pluginManager.run {
                 apply("abnrepoviewer.android.library")
+                apply("org.jetbrains.kotlin.plugin.compose")
             }
 
             extensions.configure<LibraryExtension>{

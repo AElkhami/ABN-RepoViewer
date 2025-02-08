@@ -8,6 +8,7 @@ class AndroidFeatureUiConventionPlugin: Plugin<Project> {
         target.run{
             pluginManager.run {
                 apply("abnrepoviewer.android.library.compose")
+                apply("org.jetbrains.kotlin.plugin.compose")
             }
 
             dependencies {
