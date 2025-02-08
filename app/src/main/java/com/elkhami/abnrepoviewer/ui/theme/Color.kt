@@ -1,4 +1,4 @@
-package com.elkhami.core.presentation.designsystem
+package com.elkhami.abnrepoviewer.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
