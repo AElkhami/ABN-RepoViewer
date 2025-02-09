@@ -24,7 +24,13 @@ class RepoListViewModel(
 
     fun getRepoList(page: Int) {
         viewModelScope.launch {
-            when (val result = repository.getGitRepos(page)) {
+            state = state.copy(isLoading = true)
+
+            val result = repository.getGitRepos(page)
+
+            state = state.copy(isLoading = false)
+
+            when (result) {
                 is Result.Error -> eventChannel.send(RepoListEvent.Error(result.error.asUiText()))
                 is Result.Success -> state = state.copy(repoList = result.data)
             }

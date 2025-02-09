@@ -21,9 +21,14 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import com.elkhami.domain.util.Result
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RepoListViewModelTest{
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var repository : RepoListRepository
     private lateinit var viewModel : RepoListViewModel
@@ -32,7 +37,7 @@ class RepoListViewModelTest{
 
     @BeforeEach
     fun setup() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
+        Dispatchers.setMain(testDispatcher)
         repository = mockk<RepoListRepository>()
         viewModel = RepoListViewModel(repository)
     }
@@ -42,7 +47,6 @@ class RepoListViewModelTest{
         Dispatchers.resetMain()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `getRepoList should update state with repo list on success`() = runTest {
 
@@ -59,7 +63,6 @@ class RepoListViewModelTest{
         assertThat(viewModel.state.repoList).isEqualTo(repoList)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `getRepoList should send error event on error`() = runTest {
         val dataError = DataError.Network.UNKNOWN
@@ -79,6 +82,18 @@ class RepoListViewModelTest{
 
         job.cancel()
         advanceUntilIdle()
+    }
+
+    @Test
+    fun `getRepoList should set is loading false when done`() = runTest {
+        val repoList = listOf(
+            GitRepoModel(id = 1, name = "repo1"),
+            GitRepoModel(id = 2, name = "repo2")
+        )
+
+        coEvery { repository.getGitRepos(page) } returns Result.Success(repoList)
+
+        assertThat(viewModel.state.isLoading).isEqualTo(false)
     }
 
 
