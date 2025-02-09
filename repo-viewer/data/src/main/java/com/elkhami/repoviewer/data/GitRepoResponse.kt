@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GitRepoModel(
+data class GitRepoResponse(
     val id: Int? = null,
 
     val name: String? = null,

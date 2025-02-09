@@ -10,46 +10,43 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import com.elkhami.domain.util.Result
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-
-const val PER_PAGE = 10
+import com.elkhami.repoviewer.domain.GitRepoModel
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 
 class RepoListRepositoryImplTest {
     private val httpClient: HttpClient = mockk(relaxed = true)
     private val repoListRepository = RepoListRepositoryImpl(httpClient)
 
-    @BeforeEach
-    fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
-    @AfterEach
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @Test
-    fun `getGitRepos should return success result when httpClient returns success`() = runTest {
+    fun `getGitRepos should return success result with mapped data when httpClient returns success`() = runTest {
         val page = 1
-        val expectedResult: Result<GitRepoModel, DataError.Network> = Result.Success(GitRepoModel())
+
+        val gitRepoResponseList = listOf(
+            GitRepoResponse(id = 1, name = "repo1", fullName = "owner/repo1", owner = Owner(avatarUrl = "url1")),
+            GitRepoResponse(id = 2, name = "repo2", fullName = "owner/repo2", owner = Owner(avatarUrl = "url2"))
+        )
+        val expectedGitRepoModelList = listOf(
+            GitRepoModel(id = 1, name = "repo1", fullName = "owner/repo1", ownerAvatarUrl = "url1"),
+            GitRepoModel(id = 2, name = "repo2", fullName = "owner/repo2", ownerAvatarUrl = "url2")
+        )
+
+        val successResult: Result<List<GitRepoResponse>, DataError.Network> = Result.Success(gitRepoResponseList)
+
         coEvery {
-            httpClient.get<GitRepoModel>(
-                route = "/users/abnamrocoesd/repos",
-                queryParameters = mapOf(
-                    "page" to page,
-                    "per_page" to PER_PAGE
-                )
+            httpClient.get<List<GitRepoResponse>>(
+                route = route,
+                queryParameters = mapOf("page" to page, "per_page" to PER_PAGE)
             )
-        } returns expectedResult
+        } returns successResult
+
 
         val result = repoListRepository.getGitRepos(page)
 
-        assertThat(result).isEqualTo(expectedResult)
+        Assertions.assertTrue(result is Result.Success)
+        if (result is Result.Success) {
+            assertEquals(expectedGitRepoModelList, result.data)
+        }
     }
 
     @Test
@@ -58,8 +55,8 @@ class RepoListRepositoryImplTest {
             val page = 1
             val expectedError = DataError.Network.UNKNOWN
             coEvery {
-                httpClient.get<GitRepoModel>(
-                    route = "/users/abnamrocoesd/repos",
+                httpClient.get<List<GitRepoResponse>>(
+                    route = route,
                     queryParameters = mapOf(
                         "page" to page,
                         "per_page" to PER_PAGE
