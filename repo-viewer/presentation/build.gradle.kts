@@ -10,4 +10,7 @@ android {
 dependencies {
     implementation(projects.repoViewer.domain)
     implementation(projects.core.domain)
+
+    //Paging
+    implementation(libs.bundles.paging)
 }

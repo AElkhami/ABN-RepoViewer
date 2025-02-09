@@ -1,28 +1,35 @@
 package com.elkhami.repoviewer.presentation.repolist
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.elkhami.core.presentation.components.RepoItem
-import com.elkhami.core.presentation.designsystem.AbnRepoViewerTheme
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
-import com.elkhami.core.presentation.ui.observeAsEvent
 import com.elkhami.repoviewer.domain.GitRepoModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -30,25 +37,8 @@ fun RepoListScreenRoot(
     viewModel: RepoListViewModel = koinViewModel(),
     onRepoClick: (gitRepoModel: GitRepoModel) -> Unit
 ) {
-    val context = LocalContext.current
-
-    observeAsEvent(flow = viewModel.events) { event ->
-        when (event) {
-            is RepoListEvent.Error ->
-                Toast.makeText(
-                    context,
-                    event.error.asString(context),
-                    Toast.LENGTH_LONG
-                ).show()
-        }
-    }
-
-    LaunchedEffect(true) {
-        viewModel.getRepoList(1)
-    }
-
     RepoListScreen(
-        state = viewModel.state,
+        pagingData = viewModel.gitRepoPagingFlow,
         onAction = { actions ->
             when (actions) {
                 is RepoListAction.onRepoClick -> {
@@ -61,88 +51,101 @@ fun RepoListScreenRoot(
 
 @Composable
 private fun RepoListScreen(
-    state: RepoListState,
-    onAction: (RepoListAction) -> Unit,
+    pagingData: Flow<PagingData<GitRepoModel>>,
+    onAction: (RepoListAction) -> Unit
+) {
+    val repoItems = pagingData.collectAsLazyPagingItems()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = repoItems.loadState) {
+        if (repoItems.loadState.refresh is LoadState.Error) {
+            snackbarHostState.showSnackbar(
+                "Error: " + (repoItems.loadState.refresh as LoadState.Error).error.message
+            )
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (repoItems.loadState.refresh is LoadState.Loading) {
+                CircularProgressIndicator()
+            } else {
+                RepoListComposable(repoItems, onAction)
+            }
+        }
+    }
+}
+
+@Composable
+fun RepoListComposable(
+    repoItems: LazyPagingItems<GitRepoModel>,
+    onAction: (RepoListAction) -> Unit
 ) {
     val padding = LocalPadding.current
     val dimensions = LocalDimensions.current
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding.mediumPadding)
     ) {
-        if (state.isLoading){
-            CircularProgressIndicator()
-        }else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding.mediumPadding)
-            ) {
-                state.repoList?.let { list ->
-                    itemsIndexed(list) { index, item ->
-                        RepoItem(
-                            modifier = Modifier.clickable {
-                                onAction(RepoListAction.onRepoClick(item))
-                            },
-                            name = item.name ?: "",
-                            imageUrl = item.ownerAvatarUrl ?: "",
-                            isPrivate = item.isPrivate.toString(),
-                            visibility = item.visibility ?: ""
-                        )
-                        if (index < list.lastIndex) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(
-                                    start = padding.mediumPadding,
-                                    end = padding.mediumPadding
-                                ),
-                                color = Color.Gray,
-                                thickness = dimensions.dividerThickness
-                            )
-                        }
-                    }
+        items(repoItems.itemCount) { index ->
+            repoItems[index]?.let { repoItem ->
+                RepoItem(
+                    modifier = Modifier.clickable {
+                        onAction(RepoListAction.onRepoClick(repoItem))
+                    },
+                    name = repoItem.name ?: "",
+                    imageUrl = repoItem.ownerAvatarUrl ?: "",
+                    isPrivate = repoItem.isPrivate.toString(),
+                    visibility = repoItem.visibility ?: ""
+                )
+                if (index < repoItems.itemCount) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(
+                            start = padding.mediumPadding,
+                            end = padding.mediumPadding
+                        ),
+                        color = Color.Gray,
+                        thickness = dimensions.dividerThickness
+                    )
+                }
+            }
+        }
+        item {
+            if (repoItems.loadState.append is LoadState.Loading) {
+                Box(modifier = Modifier.fillParentMaxWidth()) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun RepoListScreenPreview() {
-    AbnRepoViewerTheme {
-        RepoListScreen(
-            state = RepoListState(
-                listOf(
-                    GitRepoModel(
-                        name = "terraform-aws-fargate",
-                        isPrivate = false,
-                        visibility = "public",
-                        ownerAvatarUrl = ""
-                    ),
-                    GitRepoModel(
-                        name = "terraform-aws-fargate",
-                        isPrivate = false,
-                        visibility = "public",
-                        ownerAvatarUrl = ""
-                    )
-                )
-            ),
-            onAction = {}
-        )
-    }
-}
+    val repos = listOf(
+        GitRepoModel(1, "Repo 1", "Description for repo 1"),
+        GitRepoModel(2, "Repo 2", "Description for repo 2"),
+        GitRepoModel(3, "Repo 3", "Description for repo 3")
+    )
 
-@Preview(showBackground = true)
-@Composable
-private fun RepoListScreenLoadingPreview() {
-    AbnRepoViewerTheme {
-        RepoListScreen(
-            state = RepoListState(
-                isLoading = true
-            ),
-            onAction = {}
-        )
-    }
+    val pagingData = flowOf(PagingData.from(repos))
+
+    RepoListScreen(
+        pagingData = pagingData,
+        onAction = {}
+    )
 }

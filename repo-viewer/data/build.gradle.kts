@@ -11,6 +11,8 @@ android {
 dependencies {
     // Koin
     implementation(libs.bundles.koin)
+    //Paging
+    implementation(libs.bundles.paging)
 
     implementation(projects.core.domain)
     implementation(projects.core.data)
