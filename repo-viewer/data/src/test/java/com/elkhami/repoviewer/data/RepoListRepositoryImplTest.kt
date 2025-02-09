@@ -8,11 +8,11 @@ import io.ktor.client.HttpClient
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import kotlin.test.Test
 import com.elkhami.domain.util.Result
 import com.elkhami.repoviewer.domain.GitRepoModel
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class RepoListRepositoryImplTest {
     private val httpClient: HttpClient = mockk(relaxed = true)
