@@ -25,7 +25,6 @@ gradlePlugin {
             id = "abnrepoviewer.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
         }
-
         register("androidLibraryCompose"){
             id = "abnrepoviewer.android.library.compose"
             implementationClass = "AndroidLibraryComposeConventionPlugin"
@@ -41,6 +40,14 @@ gradlePlugin {
         register("jvmKtor"){
             id = "abnrepoviewer.jvm.ktor"
             implementationClass = "JvmKtorConventionPlugin"
+        }
+        register("jvmJunit5") {
+            id = "abnrepoviewer.jvm.junit5"
+            implementationClass = "JvmJUnit5ConventionPlugin"
+        }
+        register("androidJunit5") {
+            id = "abnrepoviewer.android.junit5"
+            implementationClass = "AndroidJUnit5ConventionPlugin"
         }
     }
 }
