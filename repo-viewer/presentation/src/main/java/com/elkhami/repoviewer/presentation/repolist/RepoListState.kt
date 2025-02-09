@@ -1,8 +1,12 @@
 package com.elkhami.repoviewer.presentation.repolist
 
 data class RepoListState(
-    var ownerName: String? = null,
-    var ownerImage: String? = null,
-    val isPrivate: Boolean = false,
+    val repoList: List<TempObject>? = null
+)
+
+data class TempObject(
+    var name: String? = null,
+    var imageUrl: String? = null,
+    val isPrivate: String? = null,
     val visibility: String? = null
 )

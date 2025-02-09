@@ -6,12 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class RepoListViewModel: ViewModel() {
-    fun onAction(action: RepoListAction) {
-        when(action){
-            else -> {}
-        }
-    }
-
     var state by mutableStateOf(RepoListState())
         private set
 }
