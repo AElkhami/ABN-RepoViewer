@@ -15,19 +15,20 @@ import com.elkhami.core.presentation.components.RepoItem
 import com.elkhami.core.presentation.designsystem.AbnRepoViewerTheme
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
+import com.elkhami.repoviewer.domain.GitRepoModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RepoListScreenRoot(
     viewModel: RepoListViewModel = koinViewModel(),
-    onRepoClick: (tempObject: TempObject) -> Unit
+    onRepoClick: (gitRepoModel: GitRepoModel) -> Unit
 ) {
     RepoListScreen(
         state = viewModel.state,
         onAction = { actions ->
             when (actions) {
                 is RepoListAction.onRepoClick -> {
-                    onRepoClick(actions.tempObject)
+                    onRepoClick(actions.gitRepoModel)
                 }
             }
         }
@@ -55,8 +56,8 @@ private fun RepoListScreen(
                             onAction(RepoListAction.onRepoClick(item))
                         },
                         name = item.name ?: "",
-                        imageUrl = item.imageUrl ?: "",
-                        isPrivate = item.isPrivate ?: "",
+                        imageUrl = item.ownerAvatarUrl ?: "",
+                        isPrivate = item.isPrivate.toString(),
                         visibility = item.visibility ?: ""
                     )
                     if (index < list.lastIndex) {
@@ -82,17 +83,17 @@ private fun RepoListScreenPreview() {
         RepoListScreen(
             state = RepoListState(
                 listOf(
-                    TempObject(
+                    GitRepoModel(
                         name = "terraform-aws-fargate",
-                        isPrivate = "false",
+                        isPrivate = false,
                         visibility = "public",
-                        imageUrl = ""
+                        ownerAvatarUrl = ""
                     ),
-                    TempObject(
+                    GitRepoModel(
                         name = "terraform-aws-fargate",
-                        isPrivate = "false",
+                        isPrivate = false,
                         visibility = "public",
-                        imageUrl = ""
+                        ownerAvatarUrl = ""
                     )
                 )
             ),
