@@ -25,6 +25,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.compose.destinations)
+    ksp(libs.compose.destinations.ksp)
 
     // Timber
     implementation(libs.timber)
@@ -40,4 +43,7 @@ dependencies {
     implementation(projects.core.presentation.designsystem)
     implementation(projects.core.domain)
     implementation(projects.core.data)
+    implementation(projects.repoViewer.presentation)
+    implementation(projects.repoViewer.domain)
+    implementation(projects.repoViewer.data)
 }
