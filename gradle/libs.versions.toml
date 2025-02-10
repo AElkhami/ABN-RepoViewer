@@ -10,7 +10,7 @@ activityCompose = "1.10.0"
 composeBom = "2024.04.01"
 jetbrainsKotlinJvm = "2.0.0"
 androidTools = "31.8.0"
-ksp = "1.9.22-1.0.17"
+ksp = "2.0.10-1.0.24"
 desugar_jdk_libs = "2.0.4"
 composeCompiler = "1.5.9"
 coroutines = "1.8.1"
@@ -28,6 +28,9 @@ appcompat = "1.6.1"
 material = "1.10.0"
 navigationCompose = "2.7.7"
 paging = "3.3.5"
+compose_destinations = "1.11.9"
+serialization = "1.8.0"
+accompanistAnimations = "0.32.0"
 
 # Project versions
 projectApplicationId = "com.elkhami.abnrepoviewer"
@@ -81,6 +84,10 @@ koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compos
 androidx_paging_runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 androidx_paging_compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
+# Compose destinations
+compose-destinations = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose_destinations" }
+compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose_destinations" }
+
 # Test dependencies
 junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
@@ -93,9 +100,11 @@ coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -104,6 +113,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit5-plugin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 # Custom Plugins
 abnrepoviewer-android-application-compose = { id = "abnrepoviewer.android.application.compose", version = "unspecified" }

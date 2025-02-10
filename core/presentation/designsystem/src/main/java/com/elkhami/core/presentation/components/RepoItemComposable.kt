@@ -60,10 +60,7 @@ fun RepoItem(
             ) {
                 Text(name, color = Color.Gray)
                 Spacer(modifier = Modifier.padding(padding.smallPadding))
-                Row {
-                    Text(stringResource(R.string.item_private))
-                    Text(isPrivate)
-                }
+                LabeledText(label = stringResource(R.string.item_private), value = isPrivate)
             }
             Box(
                 modifier = Modifier

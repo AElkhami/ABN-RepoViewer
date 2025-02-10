@@ -11,6 +11,8 @@ fun DependencyHandlerScope.addUiLayerDependency(project: Project){
 
     // Compose Ui libraries
     "implementation"(project.libs.findBundle("compose").get())
+    "implementation"(project.libs.findLibrary("compose-destinations").get())
+    "ksp"(project.libs.findLibrary("compose-destinations-ksp").get())
     "debugImplementation"(project.libs.findBundle("compose.debug").get())
     "androidTestImplementation"(project.libs.findLibrary("androidx.compose.ui.test.junit4").get())
 
