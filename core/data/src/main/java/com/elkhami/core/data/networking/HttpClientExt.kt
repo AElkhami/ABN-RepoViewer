@@ -18,7 +18,7 @@ import java.io.IOException
 suspend inline fun <reified Response : Any> HttpClient.getForPaging(
     route: String,
     queryParameters: Map<String, Any?> = mapOf()
-): Result<Response,Headers,  Any> {
+): Result<Response, Headers, Any> {
     return pagingSafeCall {
         get {
             url(constructRoute(route))
@@ -32,7 +32,7 @@ suspend inline fun <reified Response : Any> HttpClient.getForPaging(
 suspend inline fun <reified Response : Any> HttpClient.get(
     route: String,
     queryParameters: Map<String, Any?> = mapOf()
-): Result<Response,Headers, Any> {
+): Result<Response, Headers, Any> {
     return safeCall {
         get {
             url(constructRoute(route))
@@ -43,7 +43,7 @@ suspend inline fun <reified Response : Any> HttpClient.get(
     }
 }
 
-suspend inline fun <reified T> HttpClient.safeCall(execute: suspend () -> HttpResponse): Result<T, Headers, DataError.Network> {
+suspend inline fun <reified T> HttpClient.safeCall(execute: () -> HttpResponse): Result<T, Headers, DataError.Network> {
     val response: HttpResponse = try {
         execute()
     } catch (e: UnresolvedAddressException) {
@@ -52,7 +52,7 @@ suspend inline fun <reified T> HttpClient.safeCall(execute: suspend () -> HttpRe
     } catch (e: SerializationException) {
         e.printStackTrace()
         return Result.Error(DataError.Network.SERIALIZATION, Headers.Empty)
-    } catch (e: IOException){
+    } catch (e: IOException) {
         e.printStackTrace()
         return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
     } catch (e: Exception) {
@@ -65,16 +65,16 @@ suspend inline fun <reified T> HttpClient.safeCall(execute: suspend () -> HttpRe
 }
 
 // Updated pagingSafeCall
-suspend inline fun <reified T> HttpClient.pagingSafeCall(execute: suspend () -> HttpResponse): Result<T, Headers, DataError.Network> {
+suspend inline fun <reified T> HttpClient.pagingSafeCall(execute: () -> HttpResponse): Result<T, Headers, DataError.Network> {
     val response: HttpResponse = try {
         execute()
     } catch (e: UnresolvedAddressException) {
         e.printStackTrace()
         return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
-    }  catch (e: SerializationException) {
+    } catch (e: SerializationException) {
         e.printStackTrace()
         return Result.Error(DataError.Network.SERIALIZATION, Headers.Empty)
-    }  catch (e: IOException){
+    } catch (e: IOException) {
         e.printStackTrace()
         return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
     } catch (e: Exception) {
@@ -86,8 +86,9 @@ suspend inline fun <reified T> HttpClient.pagingSafeCall(execute: suspend () -> 
     return responseToDataResult(response)
 }
 
-// Updated responseToDataResult
-suspend inline fun <reified T> HttpClient.responseToDataResult(response: HttpResponse): Result<T, Headers, DataError.Network> {
+
+suspend inline fun <reified T> HttpClient.responseToDataResult(response: HttpResponse)
+: Result<T, Headers, DataError.Network> {
     return when (response.status.value) {
         in 200..299 -> Result.Success(response.body<T>(), response.headers)
         408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT, response.headers)

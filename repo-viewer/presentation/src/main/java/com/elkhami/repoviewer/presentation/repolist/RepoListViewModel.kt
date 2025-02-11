@@ -18,5 +18,5 @@ class RepoListViewModel(
         pagingList.map {
             it.toGitRepoUiModel()
         }
-    }.cachedIn(viewModelScope)
+    }
 }

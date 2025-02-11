@@ -5,13 +5,13 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.elkhami.core.data.networking.extractLastPageNumber
 import com.elkhami.core.database.AbnRepoDatabase
 import com.elkhami.core.database.entity.GitRepoEntity
 import com.elkhami.core.domain.util.Result
 import com.elkhami.repoviewer.data.mappers.toGitRepoEntity
 import io.ktor.http.HttpHeaders
 import java.io.IOException
-import java.net.URLDecoder
 
 @OptIn(ExperimentalPagingApi::class)
 class GitReposRemoteMediator(
@@ -82,26 +82,6 @@ class GitReposRemoteMediator(
             }
         } catch (e: IOException) {
             MediatorResult.Error(e)
-        }
-    }
-
-    private fun extractLastPageNumber(linkHeader: String?): Int? {
-        return linkHeader?.split(",")
-            ?.firstOrNull { it.contains("rel=\"last\"") }
-            ?.let { extractPageNumberFromLink(it) }
-    }
-
-    private fun extractPageNumberFromLink(link: String): Int? {
-        return try {
-            val url = link.substringBefore(";").trim().removeSurrounding("<", ">")
-            val query = URLDecoder.decode(url.substringAfter("?"), "UTF-8")
-            query.split("&")
-                .firstOrNull { it.startsWith("page=") }
-                ?.substringAfter("page=")
-                ?.toIntOrNull()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
     }
 }
