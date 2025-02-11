@@ -46,7 +46,12 @@ fun RepoItem(
                     .weight(0.8f)
             ) {
                 Text(name, color = Color.Gray)
-                Spacer(modifier = Modifier.padding(padding.smallPadding))
+                Spacer(
+                    modifier = Modifier.padding(
+                        horizontal = padding.smallPadding,
+                        vertical = padding.verySmallPadding
+                    )
+                )
                 LabeledText(label = stringResource(R.string.item_private), value = isPrivate)
             }
             Box(
@@ -54,7 +59,13 @@ fun RepoItem(
                     .weight(0.2f)
                     .align(Alignment.Top)
             ) {
-                Text(text = visibility, color = Color.Gray)
+                Text(
+                    text = visibility,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(
+                        start = padding.verySmallPadding
+                    )
+                )
             }
         }
     }

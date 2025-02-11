@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.LoadState
@@ -35,6 +36,7 @@ import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
 import com.elkhami.core.presentation.designsystem.Padding
 import com.elkhami.core.presentation.extentions.rememberLazyListState
+import com.elkhami.core.presentation.ui.asUiText
 import com.elkhami.repoviewer.presentation.R
 import com.elkhami.repoviewer.presentation.destinations.RepoDetailsScreenRootDestination
 import com.elkhami.repoviewer.presentation.model.GitRepoUiModel
@@ -75,12 +77,13 @@ private fun RepoListScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val networkError = stringResource(R.string.network_error)
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = repoItems.loadState.mediator) {
-        if (repoItems.loadState.mediator?.refresh is LoadState.Error) {
+        val refreshState = repoItems.loadState.mediator?.refresh
+        if (refreshState is LoadState.Error) {
             snackbarHostState.showSnackbar(
-                networkError
+                refreshState.error.asUiText().asString(context)
             )
         }
     }
@@ -111,7 +114,14 @@ private fun RepoListScreen(
                 Spacer(modifier = Modifier.padding(padding.tinyPadding))
                 Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.primary)
             } else {
-                RepoListComposable(repoItems, onAction, padding)
+                if (repoItems.loadState.mediator?.refresh is LoadState.Error) {
+                    Text(
+                        stringResource(R.string.no_repos_yet),
+                        modifier = Modifier.padding(padding.mediumPadding)
+                    )
+                } else {
+                    RepoListComposable(repoItems, onAction, padding)
+                }
             }
         }
     }
@@ -156,7 +166,7 @@ fun RepoListComposable(
             }
         }
         item {
-            if (repoItems.loadState.append is LoadState.Loading) {
+            if (repoItems.loadState.mediator?.append is LoadState.Loading) {
                 Box(modifier = Modifier.fillParentMaxWidth()) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }

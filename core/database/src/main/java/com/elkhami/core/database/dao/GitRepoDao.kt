@@ -12,7 +12,10 @@ interface GitRepoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(repoList: List<GitRepoEntity>)
 
-    @Query("SELECT * FROM git_repo ORDER BY repo_id ASC")
+    @Query("SELECT COUNT(*) FROM git_repo")
+    suspend fun count(): Int
+
+    @Query("SELECT * FROM git_repo")
     fun getGitRepoList(): PagingSource<Int, GitRepoEntity>
 
     @Query("DELETE FROM git_repo")

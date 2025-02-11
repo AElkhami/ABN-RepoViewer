@@ -31,6 +31,7 @@ class GitReposRemoteMediator(
                     currentPage = 1
                     1
                 }
+
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     val nextPage = currentPage + 1
@@ -49,10 +50,12 @@ class GitReposRemoteMediator(
             gitRepoDatabase.withTransaction {
                 when (response) {
                     is Result.Error -> {
-                        //Display the cached data
-                        MediatorResult.Success(
-                            endOfPaginationReached = true
-                        )
+                        val count = gitRepoDatabase.gitRepoDao.count()
+                        if (count == 0) {
+                            MediatorResult.Error(response.error)
+                        } else {
+                            MediatorResult.Success(endOfPaginationReached = true)
+                        }
                     }
 
                     is Result.Success -> {
