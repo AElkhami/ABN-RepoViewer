@@ -12,18 +12,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.LoadState
@@ -34,9 +41,11 @@ import com.elkhami.core.presentation.components.RepoItem
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
 import com.elkhami.core.presentation.designsystem.Padding
+import com.elkhami.core.presentation.extentions.rememberLazyListState
+import com.elkhami.core.presentation.ui.asUiText
 import com.elkhami.repoviewer.presentation.R
 import com.elkhami.repoviewer.presentation.destinations.RepoDetailsScreenRootDestination
-import com.elkhami.repoviewer.presentation.mode.GitRepoUiModel
+import com.elkhami.repoviewer.presentation.model.GitRepoUiModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -65,6 +74,7 @@ fun RepoListScreenRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RepoListScreen(
     pagingData: Flow<PagingData<GitRepoUiModel>>,
@@ -74,12 +84,13 @@ private fun RepoListScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val networkError = stringResource(R.string.network_error)
+    val context = LocalContext.current
 
-    LaunchedEffect(key1 = repoItems.loadState) {
-        if (repoItems.loadState.refresh is LoadState.Error) {
+    LaunchedEffect(key1 = repoItems.loadState.mediator) {
+        val refreshState = repoItems.loadState.mediator?.refresh
+        if (refreshState is LoadState.Error) {
             snackbarHostState.showSnackbar(
-                networkError
+                refreshState.error.asUiText().asString(context)
             )
         }
     }
@@ -87,7 +98,13 @@ private fun RepoListScreen(
     val padding = LocalPadding.current
 
     Scaffold(
-        topBar = { TopBarComposable(padding = padding, name = stringResource(R.string.app_title)) },
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopBarComposable(
+                padding = padding,
+                name = stringResource(R.string.app_title)
+            )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
@@ -99,17 +116,34 @@ private fun RepoListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (repoItems.loadState.refresh is LoadState.Loading) {
+            if (repoItems.loadState.mediator?.refresh is LoadState.Loading) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.padding(padding.tinyPadding))
                 Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.primary)
             } else {
-                RepoListComposable(repoItems, onAction, padding)
+                DisplayListOrEmpty(repoItems = repoItems, padding = padding, onAction = onAction)
             }
         }
     }
 }
 
+@Composable
+fun DisplayListOrEmpty(
+    repoItems: LazyPagingItems<GitRepoUiModel>,
+    padding: Padding,
+    onAction: (RepoListAction) -> Unit
+) {
+    if (repoItems.loadState.mediator?.refresh is LoadState.Error) {
+        Text(
+            stringResource(R.string.no_repos_yet),
+            modifier = Modifier.padding(padding.mediumPadding)
+        )
+    } else {
+        RepoListComposable(repoItems, onAction, padding)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepoListComposable(
     repoItems: LazyPagingItems<GitRepoUiModel>,
@@ -117,38 +151,54 @@ fun RepoListComposable(
     padding: Padding
 ) {
     val dimensions = LocalDimensions.current
+    val listState = repoItems.rememberLazyListState()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
+    val pullToRefreshState = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
+
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        repoItems.refresh()
+        isRefreshing = false
+    }
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = { onRefresh() },
+        state = pullToRefreshState
     ) {
-        items(repoItems.itemCount) { index ->
-            repoItems[index]?.let { repoItem ->
-                RepoItem(
-                    modifier = Modifier.clickable {
-                        onAction(RepoListAction.onRepoClick(repoItem))
-                    },
-                    name = repoItem.name ?: "",
-                    imageUrl = repoItem.ownerAvatarUrl ?: "",
-                    isPrivate = repoItem.isPrivate.toString(),
-                    visibility = repoItem.visibility ?: ""
-                )
-                if (index < repoItems.itemCount - 1) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(
-                            start = padding.mediumPadding,
-                            end = padding.mediumPadding
-                        ),
-                        color = Color.Gray,
-                        thickness = dimensions.dividerThickness
+        LazyColumn(
+            modifier = Modifier,
+            state = listState
+        ) {
+            items(count = repoItems.itemCount) { index ->
+                repoItems[index]?.let { repoItem ->
+                    RepoItem(
+                        modifier = Modifier.clickable {
+                            onAction(RepoListAction.onRepoClick(repoItem))
+                        },
+                        name = repoItem.name.orEmpty(),
+                        imageUrl = repoItem.ownerAvatarUrl.orEmpty(),
+                        isPrivate = repoItem.isPrivate.toString(),
+                        visibility = repoItem.visibility.orEmpty()
                     )
+                    if (index < repoItems.itemCount - 1) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(
+                                start = padding.mediumPadding,
+                                end = padding.mediumPadding
+                            ),
+                            color = Color.Gray,
+                            thickness = dimensions.dividerThickness
+                        )
+                    }
                 }
             }
-        }
-        item {
-            if (repoItems.loadState.append is LoadState.Loading) {
-                Box(modifier = Modifier.fillParentMaxWidth()) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            item {
+                if (repoItems.loadState.mediator?.append is LoadState.Loading) {
+                    Box(modifier = Modifier.fillParentMaxWidth()) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
                 }
             }
         }

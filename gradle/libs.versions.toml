@@ -1,17 +1,17 @@
 [versions]
 agp = "8.8.0"
 kotlin = "2.0.0"
-coreKtx = "1.10.1"
+coreKtx = "1.15.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
-composeBom = "2024.04.01"
+composeBom = "2025.01.01"
 jetbrainsKotlinJvm = "2.0.0"
 androidTools = "31.8.0"
 ksp = "2.0.10-1.0.24"
-desugar_jdk_libs = "2.0.4"
+desugar_jdk_libs = "2.1.4"
 composeCompiler = "1.5.9"
 coroutines = "1.8.1"
 ktor = "2.3.8"
@@ -24,13 +24,14 @@ junit5 = "5.10.1"
 mockk = "1.13.11"
 assertk = "0.28.1"
 junit5-plugin = "1.10.0.0"
-appcompat = "1.6.1"
-material = "1.10.0"
-navigationCompose = "2.7.7"
+appcompat = "1.7.0"
+material = "1.12.0"
+navigationCompose = "2.8.6"
 paging = "3.3.5"
 compose_destinations = "1.11.9"
 serialization = "1.8.0"
-accompanistAnimations = "0.32.0"
+room = "2.6.1"
+material3AndroidVersion = "1.3.1"
 
 # Project versions
 projectApplicationId = "com.elkhami.abnrepoviewer"
@@ -83,10 +84,17 @@ koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compos
 # paging
 androidx_paging_runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
 androidx_paging_compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+androidx-paging-compose-android = { group = "androidx.paging", name = "paging-compose-android", version.ref = "paging" }
 
 # Compose destinations
 compose-destinations = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose_destinations" }
 compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose_destinations" }
+
+# Room
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 
 # Test dependencies
 junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
@@ -103,8 +111,10 @@ kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-pl
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "room" }
 
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3AndroidVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -114,6 +124,7 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit5-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 
 # Custom Plugins
 abnrepoviewer-android-application-compose = { id = "abnrepoviewer.android.application.compose", version = "unspecified" }
@@ -125,11 +136,45 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 abnrepoviewer-jvm-ktor = { id = "abnrepoviewer.jvm.ktor", version = "unspecified" }
 abnrepoviewer-jvm-junit5 = { id = "abnrepoviewer.jvm.junit5", version = "unspecified" }
 abnrepoviewer-android-junit5 = { id = "abnrepoviewer.android.junit5", version = "unspecified" }
+abnrepoviewer-android-room = { id = "abnrepoviewer.android.room", version = "unspecified" }
 
 [bundles]
-compose = ["androidx-activity-compose", "androidx-lifecycle-runtime-compose", "androidx-lifecycle-viewmodel-compose", "androidx-compose-material3", "androidx-compose-ui", "androidx-compose-ui-graphics", "androidx-compose-ui-tooling-preview"]
-compose-debug = ["androidx-compose-ui-tooling", "androidx-compose-ui-test-manifest"]
-ktor = ["ktor-client-auth", "ktor-client-cio", "ktor-client-content-negotiation", "ktor-client-core", "ktor-client-logging", "ktor-serialization-kotlinx-json", "ktor-server-call-logging"]
-koin = ["koin-android", "koin-android-workmanager", "koin-core"]
-koin-compose = ["koin-android", "koin-android-workmanager", "koin-core", "koin-androidx-compose"]
-paging = ["androidx_paging_runtime", "androidx_paging_compose"]
+compose = [
+    "androidx-activity-compose",
+    "androidx-lifecycle-runtime-compose",
+    "androidx-lifecycle-viewmodel-compose",
+    "androidx-compose-material3",
+    "androidx-compose-ui",
+    "androidx-compose-ui-graphics",
+    "androidx-compose-ui-tooling-preview"]
+compose-debug = [
+    "androidx-compose-ui-tooling",
+    "androidx-compose-ui-test-manifest"
+]
+ktor = [
+    "ktor-client-auth",
+    "ktor-client-cio",
+    "ktor-client-content-negotiation",
+    "ktor-client-core",
+    "ktor-client-logging",
+    "ktor-serialization-kotlinx-json",
+    "ktor-server-call-logging"]
+koin = [
+    "koin-android",
+    "koin-android-workmanager",
+    "koin-core"
+]
+koin-compose = [
+    "koin-android",
+    "koin-android-workmanager",
+    "koin-core",
+    "koin-androidx-compose"
+]
+paging = [
+    "androidx_paging_runtime",
+    "androidx_paging_compose"
+]
+room = [
+    "room-ktx",
+    "room-runtime"
+]

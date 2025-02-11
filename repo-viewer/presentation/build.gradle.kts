@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.repoViewer.domain)
     implementation(projects.core.domain)
+    implementation(projects.core.database)
 
     //Coil
     implementation(libs.coil.compose)
@@ -18,4 +19,5 @@ dependencies {
     implementation(libs.bundles.paging)
     //Serialization
     implementation(libs.serialization)
+    implementation(libs.androidx.material3.android)
 }

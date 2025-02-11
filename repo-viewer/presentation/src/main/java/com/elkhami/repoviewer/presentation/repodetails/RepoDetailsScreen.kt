@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,21 +26,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import com.elkhami.core.presentation.components.LabeledText
+import com.elkhami.core.presentation.components.UrlImage
 import com.elkhami.core.presentation.components.WebButton
 import com.elkhami.core.presentation.designsystem.AbnRepoViewerTheme
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
 import com.elkhami.core.presentation.designsystem.Padding
 import com.elkhami.repoviewer.presentation.R
-import com.elkhami.repoviewer.presentation.mode.GitRepoUiModel
+import com.elkhami.repoviewer.presentation.model.GitRepoUiModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
@@ -73,7 +68,7 @@ private fun RepoDetailsScreen(
         topBar = {
             TopBarComposable(
                 padding = padding,
-                name = repoModel.name ?: "",
+                name = repoModel.name.orEmpty(),
                 onBackClick = onBackClick
             )
         },
@@ -88,15 +83,15 @@ private fun RepoDetailsScreen(
         ) {
             DetailsComposable(
                 padding = padding,
-                imageUrl = repoModel.ownerAvatarUrl ?: "",
-                fullName = repoModel.fullName ?: "",
-                description = repoModel.description ?: ""
+                imageUrl = repoModel.ownerAvatarUrl.orEmpty(),
+                fullName = repoModel.fullName.orEmpty(),
+                description = repoModel.description.orEmpty()
             )
             Spacer(modifier = Modifier.weight(1f))
             BottomSectionComposable(
                 padding = padding,
                 isPrivate = repoModel.isPrivate.toString(),
-                visibility = repoModel.visibility ?: "",
+                visibility = repoModel.visibility.orEmpty(),
                 htmlUrl = repoModel.htmlUrl,
                 snackbarHostState = snackbarHostState
             )
@@ -151,16 +146,9 @@ private fun DetailsComposable(
             .padding(padding.mediumPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .apply {
-                    transformations(CircleCropTransformation())
-                }
-                .build(),
-            contentDescription = null,
-            modifier = Modifier.size(dimensions.imageSizeLarge),
-            contentScale = ContentScale.Crop
+        UrlImage(
+            imageUrl = imageUrl,
+            imageSize = dimensions.imageSizeLarge
         )
         Spacer(modifier = Modifier.padding(padding.smallPadding))
         Text(text = fullName, style = MaterialTheme.typography.bodyLarge)

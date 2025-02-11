@@ -1,23 +1,13 @@
 package com.elkhami.core.presentation.ui
 
-import com.elkhami.domain.util.DataError
+import com.elkhami.core.domain.util.DataException
 
-fun DataError.asUiText(): UiText{
-    return when(this){
-        DataError.Network.REQUEST_TIMEOUT -> UiText.StringResource(
-            R.string.error_request_timeout
-        )
-        DataError.Network.NO_INTERNET -> UiText.StringResource(
-            R.string.error_no_internet
-        )
-        DataError.Network.SERVER_ERROR -> UiText.StringResource(
-            R.string.error_server_error
-        )
-        DataError.Network.SERIALIZATION -> UiText.StringResource(
-            R.string.error_serialization
-        )
-        else -> UiText.StringResource(
-            R.string.error_unknown
-        )
+fun Throwable.asUiText(): UiText {
+    return when (this) {
+        is DataException.RequestTimeoutException -> UiText.StringResource(R.string.error_request_timeout)
+        is DataException.NoInternetException -> UiText.StringResource(R.string.error_no_internet)
+        is DataException.ServerErrorException -> UiText.StringResource(R.string.error_server_error)
+        is DataException.SerializationException -> UiText.StringResource(R.string.error_serialization)
+        else -> UiText.StringResource(R.string.error_unknown)
     }
 }

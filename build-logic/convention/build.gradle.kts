@@ -5,6 +5,7 @@ plugins {
 group = "com.elkhami.abnrepoviewer.buildlogic"
 
 dependencies{
+    compileOnly(libs.room.gradlePlugin)
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.android.tools.common)
     compileOnly(libs.kotlin.gradlePlugin)
@@ -48,6 +49,10 @@ gradlePlugin {
         register("androidJunit5") {
             id = "abnrepoviewer.android.junit5"
             implementationClass = "AndroidJUnit5ConventionPlugin"
+        }
+        register("androidRoom") {
+            id = "abnrepoviewer.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
     }
 }

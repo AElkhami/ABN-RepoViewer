@@ -46,4 +46,5 @@ dependencies {
     implementation(projects.repoViewer.presentation)
     implementation(projects.repoViewer.domain)
     implementation(projects.repoViewer.data)
+    implementation(projects.core.database)
 }
