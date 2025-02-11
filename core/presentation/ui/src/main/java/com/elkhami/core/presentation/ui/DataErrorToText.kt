@@ -1,6 +1,6 @@
 package com.elkhami.core.presentation.ui
 
-import com.elkhami.domain.util.DataError
+import com.elkhami.core.domain.util.DataError
 
 fun DataError.asUiText(): UiText{
     return when(this){

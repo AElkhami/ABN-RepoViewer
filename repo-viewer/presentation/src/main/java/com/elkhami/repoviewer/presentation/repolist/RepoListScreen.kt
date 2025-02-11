@@ -34,9 +34,10 @@ import com.elkhami.core.presentation.components.RepoItem
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
 import com.elkhami.core.presentation.designsystem.Padding
+import com.elkhami.core.presentation.extentions.rememberLazyListState
 import com.elkhami.repoviewer.presentation.R
 import com.elkhami.repoviewer.presentation.destinations.RepoDetailsScreenRootDestination
-import com.elkhami.repoviewer.presentation.mode.GitRepoUiModel
+import com.elkhami.repoviewer.presentation.model.GitRepoUiModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -76,8 +77,8 @@ private fun RepoListScreen(
 
     val networkError = stringResource(R.string.network_error)
 
-    LaunchedEffect(key1 = repoItems.loadState) {
-        if (repoItems.loadState.refresh is LoadState.Error) {
+    LaunchedEffect(key1 = repoItems.loadState.mediator) {
+        if (repoItems.loadState.mediator?.refresh is LoadState.Error) {
             snackbarHostState.showSnackbar(
                 networkError
             )
@@ -87,7 +88,13 @@ private fun RepoListScreen(
     val padding = LocalPadding.current
 
     Scaffold(
-        topBar = { TopBarComposable(padding = padding, name = stringResource(R.string.app_title)) },
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopBarComposable(
+                padding = padding,
+                name = stringResource(R.string.app_title)
+            )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
@@ -99,7 +106,7 @@ private fun RepoListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (repoItems.loadState.refresh is LoadState.Loading) {
+            if (repoItems.loadState.mediator?.refresh is LoadState.Loading) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.padding(padding.tinyPadding))
                 Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.primary)
@@ -117,12 +124,15 @@ fun RepoListComposable(
     padding: Padding
 ) {
     val dimensions = LocalDimensions.current
+    val listState = repoItems.rememberLazyListState()
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier,
+        state = listState
     ) {
-        items(repoItems.itemCount) { index ->
+        items(
+            count = repoItems.itemCount
+        ) { index ->
             repoItems[index]?.let { repoItem ->
                 RepoItem(
                     modifier = Modifier.clickable {

@@ -1,22 +1,24 @@
 package com.elkhami.core.data.networking
 
 import com.elkhami.core.data.BuildConfig
-import com.elkhami.domain.util.DataError
-import com.elkhami.domain.util.Result
+import com.elkhami.core.domain.util.DataError
+import com.elkhami.core.domain.util.Result
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.Headers
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerializationException
+import java.io.IOException
 
 suspend inline fun <reified Response : Any> HttpClient.getForPaging(
     route: String,
     queryParameters: Map<String, Any?> = mapOf()
-): Result<Response, Any> {
+): Result<Response,Headers,  Any> {
     return pagingSafeCall {
         get {
             url(constructRoute(route))
@@ -30,7 +32,7 @@ suspend inline fun <reified Response : Any> HttpClient.getForPaging(
 suspend inline fun <reified Response : Any> HttpClient.get(
     route: String,
     queryParameters: Map<String, Any?> = mapOf()
-): Result<Response, Any> {
+): Result<Response,Headers, Any> {
     return safeCall {
         get {
             url(constructRoute(route))
@@ -41,48 +43,56 @@ suspend inline fun <reified Response : Any> HttpClient.get(
     }
 }
 
-suspend inline fun <reified T> safeCall(execute: () -> HttpResponse): Result<T, DataError.Network> {
-    val response = try {
+suspend inline fun <reified T> HttpClient.safeCall(execute: suspend () -> HttpResponse): Result<T, Headers, DataError.Network> {
+    val response: HttpResponse = try {
         execute()
     } catch (e: UnresolvedAddressException) {
         e.printStackTrace()
-        return Result.Error(DataError.Network.NO_INTERNET)
+        return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
     } catch (e: SerializationException) {
         e.printStackTrace()
-        return Result.Error(DataError.Network.SERIALIZATION)
+        return Result.Error(DataError.Network.SERIALIZATION, Headers.Empty)
+    } catch (e: IOException){
+        e.printStackTrace()
+        return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
     } catch (e: Exception) {
         if (e is CancellationException) throw e
         e.printStackTrace()
-        return Result.Error(DataError.Network.UNKNOWN)
+        return Result.Error(DataError.Network.UNKNOWN, Headers.Empty)
     }
 
     return responseToDataResult(response)
 }
 
-suspend inline fun <reified T> pagingSafeCall(execute: () -> HttpResponse): Result<T, Any> {
-    val response = try {
+// Updated pagingSafeCall
+suspend inline fun <reified T> HttpClient.pagingSafeCall(execute: suspend () -> HttpResponse): Result<T, Headers, DataError.Network> {
+    val response: HttpResponse = try {
         execute()
     } catch (e: UnresolvedAddressException) {
         e.printStackTrace()
-        return Result.Error(e)
-    } catch (e: SerializationException) {
+        return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
+    }  catch (e: SerializationException) {
         e.printStackTrace()
-        return Result.Error(e)
+        return Result.Error(DataError.Network.SERIALIZATION, Headers.Empty)
+    }  catch (e: IOException){
+        e.printStackTrace()
+        return Result.Error(DataError.Network.NO_INTERNET, Headers.Empty)
     } catch (e: Exception) {
         if (e is CancellationException) throw e
         e.printStackTrace()
-        return Result.Error(e)
+        return Result.Error(DataError.Network.UNKNOWN, Headers.Empty)
     }
 
     return responseToDataResult(response)
 }
 
-suspend inline fun <reified T> responseToDataResult(response: HttpResponse): Result<T, DataError.Network> {
+// Updated responseToDataResult
+suspend inline fun <reified T> HttpClient.responseToDataResult(response: HttpResponse): Result<T, Headers, DataError.Network> {
     return when (response.status.value) {
-        in 200..299 -> Result.Success(response.body<T>())
-        408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
-        in 500..599 -> Result.Error(DataError.Network.SERVER_ERROR)
-        else -> Result.Error(DataError.Network.UNKNOWN)
+        in 200..299 -> Result.Success(response.body<T>(), response.headers)
+        408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT, response.headers)
+        in 500..599 -> Result.Error(DataError.Network.SERVER_ERROR, response.headers)
+        else -> Result.Error(DataError.Network.UNKNOWN, response.headers)
     }
 }
 

@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(projects.repoViewer.domain)
     implementation(projects.core.domain)
+    implementation(projects.core.database)
 
     //Coil
     implementation(libs.coil.compose)

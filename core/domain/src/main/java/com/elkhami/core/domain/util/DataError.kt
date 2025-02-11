@@ -1,4 +1,4 @@
-package com.elkhami.domain.util
+package com.elkhami.core.domain.util
 
 sealed interface DataError: Error {
     enum class Network: DataError {
