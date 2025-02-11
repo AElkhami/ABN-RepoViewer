@@ -3,13 +3,15 @@ package com.elkhami.core.presentation.components
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import kotlinx.coroutines.launch
+import com.elkhami.core.presentation.designsystem.R
 
 @Composable
 fun WebButton(
@@ -30,7 +32,10 @@ fun WebButton(
             onActivityNotFound()
         }
     }) {
-        Text("Open Repository")
+        Text(
+            text = stringResource(R.string.open_repo),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 

@@ -5,11 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.elkhami.core.presentation.components.ComposableConstants.CURVE_RADIUS
+import com.elkhami.core.presentation.designsystem.R
 
 @Composable
 fun UrlImage(
@@ -26,6 +28,8 @@ fun UrlImage(
             .build(),
         contentDescription = null,
         modifier = modifier.size(imageSize),
-        contentScale = ContentScale.Crop
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(id = R.drawable.place_holder),
+        error = painterResource(id = R.drawable.place_holder)
     )
 }

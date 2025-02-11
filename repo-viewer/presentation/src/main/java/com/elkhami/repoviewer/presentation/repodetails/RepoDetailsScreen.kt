@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.elkhami.core.presentation.components.LabeledText
 import com.elkhami.core.presentation.components.UrlImage
@@ -126,7 +128,10 @@ private fun TopBarComposable(
         Text(
             text = name,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center).fillMaxWidth().padding(horizontal = padding.largePadding),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -151,9 +156,19 @@ private fun DetailsComposable(
             imageSize = dimensions.imageSizeLarge
         )
         Spacer(modifier = Modifier.padding(padding.smallPadding))
-        Text(text = fullName, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = fullName,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
         Spacer(modifier = Modifier.padding(padding.smallPadding))
-        Text(text = description)
+        Text(
+            text = description,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -180,18 +195,22 @@ private fun BottomSectionComposable(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = visibility, color = Color.Gray)
+            Text(
+                text = visibility,
+                color = Color.Gray,
+                style = MaterialTheme.typography.bodySmall
+            )
             LabeledText(label = stringResource(R.string.item_private), value = isPrivate)
         }
 
-        val x = stringResource(R.string.no_browser)
+        val noBrowserMessage = stringResource(R.string.no_browser)
 
         htmlUrl?.let {
             WebButton(
                 url = htmlUrl,
                 onActivityNotFound = {
                     coroutineScope.launch {
-                        snackbarHostState.showSnackbar(x)
+                        snackbarHostState.showSnackbar(noBrowserMessage)
                     }
                 }
             )
@@ -207,7 +226,7 @@ private fun RepoDetailsScreenPreview() {
     AbnRepoViewerTheme {
         RepoDetailsScreen(
             repoModel = GitRepoUiModel(
-                name = "name",
+                name = "A very very very very long Name",
                 fullName = "full name",
                 description = "desc",
                 visibility = "public",
