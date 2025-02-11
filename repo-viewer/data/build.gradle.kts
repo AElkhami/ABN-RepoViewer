@@ -20,6 +20,5 @@ dependencies {
 
     implementation(projects.core.domain)
     implementation(projects.core.data)
-    implementation(projects.repoViewer.domain)
     implementation(projects.core.database)
 }

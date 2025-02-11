@@ -3,6 +3,7 @@ package com.elkhami.core.presentation.components
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,9 +20,15 @@ fun LabeledText(
     val padding = LocalPadding.current
 
     Row(modifier = modifier) {
-        Text(label)
+        Text(text = label,
+            style = MaterialTheme.typography.bodySmall
+        )
         Spacer(modifier = Modifier.padding(padding.tinyPadding))
-        Text(value, color = Color.Gray)
+        Text(
+            text = value,
+            color = Color.Gray,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
 

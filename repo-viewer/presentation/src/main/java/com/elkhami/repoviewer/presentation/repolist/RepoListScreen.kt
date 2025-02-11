@@ -11,17 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +35,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.elkhami.core.presentation.components.PullToRefreshPaginatedLazyColumn
 import com.elkhami.core.presentation.components.RepoItem
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
@@ -67,7 +64,7 @@ fun RepoListScreenRoot(
         pagingData = viewModel.gitRepoPagingFlow,
         onAction = { actions ->
             when (actions) {
-                is RepoListAction.onRepoClick -> {
+                is RepoListAction.OnRepoClick -> {
                     navigator.navigate(
                         RepoDetailsScreenRootDestination(gitRepo = actions.gitRepoModel)
                     )
@@ -122,7 +119,11 @@ private fun RepoListScreen(
             if (repoItems.loadState.mediator?.refresh is LoadState.Loading) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.padding(padding.tinyPadding))
-                Text(stringResource(R.string.loading), color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(R.string.loading),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             } else {
                 DisplayListOrEmpty(repoItems = repoItems, padding = padding, onAction = onAction)
             }
@@ -162,14 +163,14 @@ fun DisplayListOrEmpty(
     if (repoItems.loadState.mediator?.refresh is LoadState.Error) {
         Text(
             stringResource(R.string.no_repos_yet),
-            modifier = Modifier.padding(padding.mediumPadding)
+            modifier = Modifier.padding(padding.mediumPadding),
+            style = MaterialTheme.typography.bodyMedium
         )
     } else {
         RepoListComposable(repoItems, onAction, padding)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepoListComposable(
     repoItems: LazyPagingItems<GitRepoUiModel>,
@@ -179,56 +180,35 @@ fun RepoListComposable(
     val dimensions = LocalDimensions.current
     val listState = repoItems.rememberLazyListState()
 
-    val pullToRefreshState = rememberPullToRefreshState()
-    var isRefreshing by remember { mutableStateOf(false) }
-
-    val onRefresh: () -> Unit = {
-        isRefreshing = true
-        repoItems.refresh()
-        isRefreshing = false
-    }
-
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = { onRefresh() },
-        state = pullToRefreshState
-    ) {
-        LazyColumn(
-            modifier = Modifier,
-            state = listState
-        ) {
-            items(count = repoItems.itemCount) { index ->
-                repoItems[index]?.let { repoItem ->
-                    RepoItem(
-                        modifier = Modifier.clickable {
-                            onAction(RepoListAction.onRepoClick(repoItem))
-                        },
-                        name = repoItem.name.orEmpty(),
-                        imageUrl = repoItem.ownerAvatarUrl.orEmpty(),
-                        isPrivate = repoItem.isPrivate.toString(),
-                        visibility = repoItem.visibility.orEmpty()
-                    )
-                    if (index < repoItems.itemCount - 1) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(
-                                start = padding.mediumPadding,
-                                end = padding.mediumPadding
-                            ),
-                            color = Color.Gray,
-                            thickness = dimensions.dividerThickness
-                        )
-                    }
-                }
-            }
-            item {
-                if (repoItems.loadState.mediator?.append is LoadState.Loading) {
-                    Box(modifier = Modifier.fillParentMaxWidth()) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
-                }
+    PullToRefreshPaginatedLazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        listState = listState,
+        lazyPagingItems = repoItems,
+        refreshAction = {
+            repoItems.refresh()
+        },
+        listItemContent = { repoItem, index ->
+            RepoItem(
+                modifier = Modifier.clickable {
+                    onAction(RepoListAction.OnRepoClick(repoItem))
+                },
+                name = repoItem.name.orEmpty(),
+                imageUrl = repoItem.ownerAvatarUrl.orEmpty(),
+                isPrivate = repoItem.isPrivate.toString(),
+                visibility = repoItem.visibility.orEmpty()
+            )
+            if (index < repoItems.itemCount - 1) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(
+                        start = padding.mediumPadding,
+                        end = padding.mediumPadding
+                    ),
+                    color = Color.Gray,
+                    thickness = dimensions.dividerThickness
+                )
             }
         }
-    }
+    )
 }
 
 @Composable

@@ -6,7 +6,7 @@ import androidx.compose.ui.unit.dp
 
 data class Dimensions(
     val imageSize: Dp = 50.dp,
-    val imageSizeLarge: Dp = 180.dp,
+    val imageSizeLarge: Dp = 120.dp,
     val dividerThickness: Dp = 1.dp,
     val topBarHeight: Dp = 56.dp
 )
