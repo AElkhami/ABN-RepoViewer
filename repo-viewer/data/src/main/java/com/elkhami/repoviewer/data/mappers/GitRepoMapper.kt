@@ -5,11 +5,11 @@ import com.elkhami.repoviewer.data.GitRepoResponse
 
 fun GitRepoResponse.toGitRepoEntity() = GitRepoEntity(
     repoId = this.repoId ?: 0,
-    name = this.name ?: "",
-    fullName = this.fullName ?: "",
-    description = this.description ?: "",
+    name = this.name.orEmpty(),
+    fullName = this.fullName.orEmpty(),
+    description = this.description.orEmpty(),
     isPrivate = this.isPrivate,
-    ownerAvatarUrl = this.ownerAvatarUrl ?: "",
-    htmlUrl = this.htmlUrl ?: "",
-    visibility = this.visibility ?: ""
+    ownerAvatarUrl = this.ownerAvatarUrl.orEmpty(),
+    htmlUrl = this.htmlUrl.orEmpty(),
+    visibility = this.visibility.orEmpty()
 )

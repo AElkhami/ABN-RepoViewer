@@ -18,6 +18,7 @@ val repoViewerDataModule = module {
         Pager(
             config = PagingConfig(
                 pageSize = DEFAULT_PAGE_SIZE,
+                prefetchDistance = 5,
                 initialLoadSize = DEFAULT_PAGE_SIZE,
                 enablePlaceholders = false
             ),

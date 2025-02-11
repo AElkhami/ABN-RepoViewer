@@ -29,34 +29,34 @@ suspend inline fun <reified Response : Any> HttpClient.get(
     }
 }
 
-suspend inline fun <reified T> HttpClient.safeCall(execute: () -> HttpResponse): Result<T, Headers> {
+suspend inline fun <reified T> safeCall(execute: () -> HttpResponse): Result<T, Headers> {
     val response: HttpResponse = try {
         execute()
     } catch (e: UnresolvedAddressException) {
         e.printStackTrace()
-        return Result.Error(DataException.NoInternetException(), Headers.Empty)
+        return Result.Error(DataException.NoInternetException())
     } catch (e: SerializationException) {
         e.printStackTrace()
-        return Result.Error(DataException.SerializationException(), Headers.Empty)
+        return Result.Error(DataException.SerializationException())
     } catch (e: IOException) {
         e.printStackTrace()
-        return Result.Error(DataException.NoInternetException(), Headers.Empty)
+        return Result.Error(DataException.NoInternetException())
     } catch (e: Exception) {
         if (e is CancellationException) throw e
         e.printStackTrace()
-        return Result.Error(DataException.UnknownException(), Headers.Empty)
+        return Result.Error(DataException.UnknownException())
     }
 
     return responseToDataResult(response)
 }
 
 
-suspend inline fun <reified T> HttpClient.responseToDataResult(response: HttpResponse): Result<T, Headers> {
+suspend inline fun <reified T> responseToDataResult(response: HttpResponse): Result<T, Headers> {
     return when (response.status.value) {
         in 200..299 -> Result.Success(response.body<T>(), response.headers)
-        408 -> Result.Error(DataException.RequestTimeoutException(), response.headers)
-        in 500..599 -> Result.Error(DataException.ServerErrorException(), response.headers)
-        else -> Result.Error(DataException.UnknownException(), response.headers)
+        408 -> Result.Error(DataException.RequestTimeoutException())
+        in 500..599 -> Result.Error(DataException.ServerErrorException())
+        else -> Result.Error(DataException.UnknownException())
     }
 }
 

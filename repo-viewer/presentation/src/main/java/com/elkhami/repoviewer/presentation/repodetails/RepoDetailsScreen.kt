@@ -68,7 +68,7 @@ private fun RepoDetailsScreen(
         topBar = {
             TopBarComposable(
                 padding = padding,
-                name = repoModel.name ?: "",
+                name = repoModel.name.orEmpty(),
                 onBackClick = onBackClick
             )
         },
@@ -83,15 +83,15 @@ private fun RepoDetailsScreen(
         ) {
             DetailsComposable(
                 padding = padding,
-                imageUrl = repoModel.ownerAvatarUrl ?: "",
-                fullName = repoModel.fullName ?: "",
-                description = repoModel.description ?: ""
+                imageUrl = repoModel.ownerAvatarUrl.orEmpty(),
+                fullName = repoModel.fullName.orEmpty(),
+                description = repoModel.description.orEmpty()
             )
             Spacer(modifier = Modifier.weight(1f))
             BottomSectionComposable(
                 padding = padding,
                 isPrivate = repoModel.isPrivate.toString(),
-                visibility = repoModel.visibility ?: "",
+                visibility = repoModel.visibility.orEmpty(),
                 htmlUrl = repoModel.htmlUrl,
                 snackbarHostState = snackbarHostState
             )
