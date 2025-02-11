@@ -1,5 +1,6 @@
 package com.elkhami.repoviewer.presentation.repolist
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +45,7 @@ import com.elkhami.core.presentation.designsystem.LocalPadding
 import com.elkhami.core.presentation.designsystem.Padding
 import com.elkhami.core.presentation.extentions.rememberLazyListState
 import com.elkhami.core.presentation.ui.asUiText
+import com.elkhami.repoviewer.presentation.NetworkMonitor
 import com.elkhami.repoviewer.presentation.R
 import com.elkhami.repoviewer.presentation.destinations.RepoDetailsScreenRootDestination
 import com.elkhami.repoviewer.presentation.model.GitRepoUiModel
@@ -74,7 +77,6 @@ fun RepoListScreenRoot(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RepoListScreen(
     pagingData: Flow<PagingData<GitRepoUiModel>>,
@@ -82,9 +84,12 @@ private fun RepoListScreen(
 ) {
     val repoItems = pagingData.collectAsLazyPagingItems()
 
-    val snackbarHostState = remember { SnackbarHostState() }
-
+    val padding = LocalPadding.current
     val context = LocalContext.current
+
+    HandleNetworkState(context, repoItems)
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = repoItems.loadState.mediator) {
         val refreshState = repoItems.loadState.mediator?.refresh
@@ -94,8 +99,6 @@ private fun RepoListScreen(
             )
         }
     }
-
-    val padding = LocalPadding.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -123,6 +126,29 @@ private fun RepoListScreen(
             } else {
                 DisplayListOrEmpty(repoItems = repoItems, padding = padding, onAction = onAction)
             }
+        }
+    }
+}
+
+@Composable
+fun HandleNetworkState(context: Context, repoItems: LazyPagingItems<GitRepoUiModel>) {
+    var isConnected by remember { mutableStateOf(false) }
+    var wasPreviouslyOffline by remember { mutableStateOf(false) }
+
+    val networkMonitor = remember {
+        NetworkMonitor(context, onNetworkStatusChanged = { isOnline ->
+            if (isOnline && wasPreviouslyOffline) {
+                repoItems.refresh()
+            }
+            isConnected = isOnline
+            wasPreviouslyOffline = !isOnline
+        })
+    }
+
+    DisposableEffect(context) {
+        networkMonitor.register()
+        onDispose {
+            networkMonitor.unregister()
         }
     }
 }
