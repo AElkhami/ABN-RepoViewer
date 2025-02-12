@@ -4,6 +4,7 @@ import com.elkhami.core.database.entity.GitRepoEntity
 import com.elkhami.repoviewer.data.remote.GitRepoResponse
 
 fun GitRepoResponse.toGitRepoEntity() = GitRepoEntity(
+    id = 0,
     repoId = this.repoId ?: 0,
     name = this.name.orEmpty(),
     fullName = this.fullName.orEmpty(),

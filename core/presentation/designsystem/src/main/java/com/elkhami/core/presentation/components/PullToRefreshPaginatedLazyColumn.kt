@@ -24,8 +24,9 @@ fun <T : Any> PullToRefreshPaginatedLazyColumn(
     modifier: Modifier = Modifier,
     listState: LazyListState,
     lazyPagingItems: LazyPagingItems<T>,
-    refreshAction: () -> Unit,
-    listItemContent: @Composable (T, Int) -> Unit
+    listItemContent: @Composable (T, Int) -> Unit,
+    key: ((index: Int) -> Any)?,
+    refreshAction: () -> Unit
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
@@ -46,7 +47,10 @@ fun <T : Any> PullToRefreshPaginatedLazyColumn(
             modifier = Modifier,
             state = listState
         ) {
-            items(lazyPagingItems.itemCount) { index ->
+            items(
+                count = lazyPagingItems.itemCount,
+                key = key
+            ) { index ->
                 val item = lazyPagingItems[index]
                 item?.let {
                     listItemContent(it, index)

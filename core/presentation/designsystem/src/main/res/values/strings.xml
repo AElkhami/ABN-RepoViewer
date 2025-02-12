@@ -2,4 +2,5 @@
 <resources>
     <string name="item_private">Private:</string>
     <string name="open_repo">Open Repository</string>
+    <string name="loading">Loading&#8230;</string>
 </resources>

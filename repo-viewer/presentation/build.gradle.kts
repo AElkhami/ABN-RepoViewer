@@ -19,5 +19,4 @@ dependencies {
     implementation(libs.bundles.paging)
     //Serialization
     implementation(libs.serialization)
-    implementation(libs.androidx.material3.android)
 }

@@ -1,13 +1,12 @@
 package com.elkhami.core.database.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "git_repo")
 data class GitRepoEntity(
-    @PrimaryKey
-    @ColumnInfo(name = "repo_id")
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val repoId: Int,
     val name: String,
     val fullName: String,
