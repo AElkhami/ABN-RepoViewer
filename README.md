@@ -4,18 +4,21 @@
 
 An Android app to browse and explore GitHub public repositories, with offline caching for seamless access.
 
-<div style="display: flex; justify-content: space-around;">
-  <img src="https://github.com/AElkhami/ABN-RepoViewer/blob/develop/paging.gif" width="200" />
-  <img src="https://github.com/AElkhami/ABN-RepoViewer/blob/develop/details.gif" width="200" />
-</div>
-
 ## Table of Contents
+* [App Demo](#app-demo)
 * [General Info](#general-info)
 * [Features](#features)
 * [Technologies](#technologies)
 * [Architecture](#architecture)
 * [Modularization Strategy](#modularization-strategy)
 * [Testing](#testing)
+
+
+## App Demo
+<div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/AElkhami/ABN-RepoViewer/blob/develop/paging.gif" width="200" />
+  <img src="https://github.com/AElkhami/ABN-RepoViewer/blob/develop/details.gif" width="200" />
+</div>
 
 ## General Info
 **ABN Repo Viewer** is an Android application that allows users to:
