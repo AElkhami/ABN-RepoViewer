@@ -14,7 +14,8 @@ class AndroidJUnit5ConventionPlugin: Plugin<Project> {
                 "androidTestImplementation"(libs.findLibrary("junit5.api").get())
                 "androidTestImplementation"(libs.findLibrary("junit5.params").get())
                 "androidTestRuntimeOnly"(libs.findLibrary("junit5.engine").get())
-
+                "androidTestImplementation"(libs.findLibrary("mockk").get())
+                "androidTestImplementation"(libs.findLibrary("mockk-android").get())
                 "androidTestImplementation"(libs.findLibrary("assertk").get())
                 "androidTestImplementation"(libs.findLibrary("coroutines.test").get())
             }

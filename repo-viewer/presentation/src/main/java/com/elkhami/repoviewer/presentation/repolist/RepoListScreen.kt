@@ -75,7 +75,7 @@ fun RepoListScreenRoot(
 }
 
 @Composable
-private fun RepoListScreen(
+fun RepoListScreen(
     pagingData: Flow<PagingData<GitRepoUiModel>>,
     onAction: (RepoListAction) -> Unit
 ) {

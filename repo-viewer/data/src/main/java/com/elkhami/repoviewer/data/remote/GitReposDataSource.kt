@@ -1,4 +1,4 @@
-package com.elkhami.repoviewer.data
+package com.elkhami.repoviewer.data.remote
 
 import com.elkhami.core.data.networking.get
 import com.elkhami.core.domain.util.Result

@@ -58,7 +58,7 @@ fun RepoDetailsScreenRoot(
 }
 
 @Composable
-private fun RepoDetailsScreen(
+fun RepoDetailsScreen(
     modifier: Modifier = Modifier,
     repoModel: GitRepoUiModel,
     onBackClick: () -> Unit
@@ -102,7 +102,7 @@ private fun RepoDetailsScreen(
 }
 
 @Composable
-private fun TopBarComposable(
+fun TopBarComposable(
     modifier: Modifier = Modifier,
     padding: Padding,
     name: String,
@@ -118,7 +118,7 @@ private fun TopBarComposable(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.button_back),
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .clickable {
@@ -128,7 +128,10 @@ private fun TopBarComposable(
         Text(
             text = name,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.align(Alignment.Center).fillMaxWidth().padding(horizontal = padding.largePadding),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth()
+                .padding(horizontal = padding.largePadding),
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -137,7 +140,7 @@ private fun TopBarComposable(
 }
 
 @Composable
-private fun DetailsComposable(
+fun DetailsComposable(
     modifier: Modifier = Modifier,
     padding: Padding,
     fullName: String,

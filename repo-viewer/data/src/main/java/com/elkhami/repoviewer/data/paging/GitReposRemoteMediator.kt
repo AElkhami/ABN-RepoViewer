@@ -1,4 +1,4 @@
-package com.elkhami.repoviewer.data
+package com.elkhami.repoviewer.data.paging
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -10,6 +10,7 @@ import com.elkhami.core.database.AbnRepoDatabase
 import com.elkhami.core.database.entity.GitRepoEntity
 import com.elkhami.core.domain.util.Result
 import com.elkhami.repoviewer.data.mappers.toGitRepoEntity
+import com.elkhami.repoviewer.data.remote.GitReposDataSource
 import io.ktor.http.HttpHeaders
 import java.io.IOException
 
