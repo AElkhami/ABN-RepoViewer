@@ -5,13 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,8 +33,10 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.elkhami.core.presentation.components.PullToRefreshPaginatedLazyColumn
 import com.elkhami.core.presentation.components.RepoItem
+import com.elkhami.core.presentation.components.ShowLoading
 import com.elkhami.core.presentation.designsystem.LocalDimensions
 import com.elkhami.core.presentation.designsystem.LocalPadding
 import com.elkhami.core.presentation.designsystem.Padding
@@ -116,58 +116,46 @@ fun RepoListScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (repoItems.loadState.mediator?.refresh is LoadState.Loading) {
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.padding(padding.tinyPadding))
-                Text(
-                    stringResource(R.string.loading),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            } else {
-                DisplayListOrEmpty(repoItems = repoItems, padding = padding, onAction = onAction)
+            when (repoItems.loadState.mediator?.refresh) {
+                is LoadState.Error -> {
+                    Text(
+                        stringResource(R.string.no_repos_yet),
+                        modifier = Modifier.padding(padding.mediumPadding),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                LoadState.Loading -> {
+                    ShowLoading(padding)
+                }
+
+                else -> {
+                    RepoListComposable(repoItems, onAction, padding)
+                }
             }
         }
     }
 }
 
 @Composable
-fun HandleNetworkState(context: Context, repoItems: LazyPagingItems<GitRepoUiModel>) {
-    var isConnected by remember { mutableStateOf(false) }
-    var wasPreviouslyOffline by remember { mutableStateOf(false) }
-
-    val networkMonitor = remember {
-        NetworkMonitor(context, onNetworkStatusChanged = { isOnline ->
-            if (isOnline && wasPreviouslyOffline) {
-                repoItems.refresh()
-            }
-            isConnected = isOnline
-            wasPreviouslyOffline = !isOnline
-        })
-    }
-
-    DisposableEffect(context) {
-        networkMonitor.register()
-        onDispose {
-            networkMonitor.unregister()
-        }
-    }
-}
-
-@Composable
-fun DisplayListOrEmpty(
-    repoItems: LazyPagingItems<GitRepoUiModel>,
+private fun TopBarComposable(
+    modifier: Modifier = Modifier,
     padding: Padding,
-    onAction: (RepoListAction) -> Unit
+    name: String,
 ) {
-    if (repoItems.loadState.mediator?.refresh is LoadState.Error) {
+    val dimensions = LocalDimensions.current
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .height(dimensions.topBarHeight)
+            .padding(horizontal = padding.mediumPadding)
+    ) {
         Text(
-            stringResource(R.string.no_repos_yet),
-            modifier = Modifier.padding(padding.mediumPadding),
-            style = MaterialTheme.typography.bodyMedium
+            text = name,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.align(Alignment.Center)
         )
-    } else {
-        RepoListComposable(repoItems, onAction, padding)
     }
 }
 
@@ -187,6 +175,7 @@ fun RepoListComposable(
         refreshAction = {
             repoItems.refresh()
         },
+        key = repoItems.itemKey { it.id ?: 0 },
         listItemContent = { repoItem, index ->
             RepoItem(
                 modifier = Modifier.clickable {
@@ -212,24 +201,25 @@ fun RepoListComposable(
 }
 
 @Composable
-private fun TopBarComposable(
-    modifier: Modifier = Modifier,
-    padding: Padding,
-    name: String,
-) {
-    val dimensions = LocalDimensions.current
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .statusBarsPadding()
-            .height(dimensions.topBarHeight)
-            .padding(horizontal = padding.mediumPadding)
-    ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.align(Alignment.Center)
-        )
+fun HandleNetworkState(context: Context, repoItems: LazyPagingItems<GitRepoUiModel>) {
+    var isConnected by remember { mutableStateOf(false) }
+    var wasPreviouslyOffline by remember { mutableStateOf(false) }
+
+    val networkMonitor = remember {
+        NetworkMonitor(context, onNetworkStatusChanged = { isOnline ->
+            if (isOnline && wasPreviouslyOffline) {
+                repoItems.refresh()
+            }
+            isConnected = isOnline
+            wasPreviouslyOffline = !isOnline
+        })
+    }
+
+    DisposableEffect(context) {
+        networkMonitor.register()
+        onDispose {
+            networkMonitor.unregister()
+        }
     }
 }
 

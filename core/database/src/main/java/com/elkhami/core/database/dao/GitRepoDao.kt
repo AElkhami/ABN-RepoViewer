@@ -15,7 +15,7 @@ interface GitRepoDao {
     @Query("SELECT COUNT(*) FROM git_repo")
     suspend fun count(): Int
 
-    @Query("SELECT * FROM git_repo")
+    @Query("SELECT * FROM git_repo ORDER BY id ASC")
     fun getGitRepoList(): PagingSource<Int, GitRepoEntity>
 
     @Query("DELETE FROM git_repo")

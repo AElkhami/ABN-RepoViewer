@@ -4,6 +4,7 @@ import com.elkhami.core.database.entity.GitRepoEntity
 import com.elkhami.repoviewer.presentation.model.GitRepoUiModel
 
 fun GitRepoEntity.toGitRepoUiModel() = GitRepoUiModel(
+    id = this.id,
     name = this.name,
     fullName = this.fullName,
     description = this.description,

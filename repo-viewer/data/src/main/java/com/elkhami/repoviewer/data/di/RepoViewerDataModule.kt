@@ -17,10 +17,7 @@ val repoViewerDataModule = module {
     single {
         Pager(
             config = PagingConfig(
-                pageSize = DEFAULT_PAGE_SIZE,
-                prefetchDistance = 5,
-                initialLoadSize = DEFAULT_PAGE_SIZE,
-                enablePlaceholders = false
+                pageSize = DEFAULT_PAGE_SIZE
             ),
             remoteMediator = GitReposRemoteMediator(get(), get()),
             pagingSourceFactory = {
