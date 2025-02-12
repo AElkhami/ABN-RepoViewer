@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.abnrepoviewer.android.feature.ui)
     alias(libs.plugins.abnrepoviewer.jvm.junit5)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.abnrepoviewer.android.junit5)
 }
 
 android {

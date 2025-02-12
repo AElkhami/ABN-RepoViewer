@@ -5,4 +5,5 @@
     <string name="app_title">Abn Rep Viewer</string>
     <string name="loading">Loading&#8230;</string>
     <string name="no_repos_yet">There is no repositories available yet&#8230;</string>
+    <string name="button_back">Back</string>
 </resources>

@@ -4,9 +4,9 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.elkhami.core.database.AbnRepoDatabase
-import com.elkhami.repoviewer.data.GitReposDataSource
-import com.elkhami.repoviewer.data.GitReposRemoteMediator
-import com.elkhami.repoviewer.data.PagingConstants.DEFAULT_PAGE_SIZE
+import com.elkhami.repoviewer.data.remote.GitReposDataSource
+import com.elkhami.repoviewer.data.paging.GitReposRemoteMediator
+import com.elkhami.repoviewer.data.paging.PagingConstants.DEFAULT_PAGE_SIZE
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 

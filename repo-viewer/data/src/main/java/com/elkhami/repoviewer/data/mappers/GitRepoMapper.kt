@@ -1,7 +1,7 @@
 package com.elkhami.repoviewer.data.mappers
 
 import com.elkhami.core.database.entity.GitRepoEntity
-import com.elkhami.repoviewer.data.GitRepoResponse
+import com.elkhami.repoviewer.data.remote.GitRepoResponse
 
 fun GitRepoResponse.toGitRepoEntity() = GitRepoEntity(
     repoId = this.repoId ?: 0,

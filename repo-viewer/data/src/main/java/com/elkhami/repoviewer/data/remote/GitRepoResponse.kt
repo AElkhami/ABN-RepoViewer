@@ -1,4 +1,4 @@
-package com.elkhami.repoviewer.data
+package com.elkhami.repoviewer.data.remote
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
